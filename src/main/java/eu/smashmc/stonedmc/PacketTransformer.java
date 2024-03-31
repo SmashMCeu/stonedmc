@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.UUID;
 
 @Managed
 public class PacketTransformer implements Listener {
@@ -23,6 +24,8 @@ public class PacketTransformer implements Listener {
 
 	private static final String SKIN_VALUE = "ewogICJ0aW1lc3RhbXAiIDogMTcxMTkxMDA3MDA2NCwKICAicHJvZmlsZUlkIiA6ICJiMDc3MDc2ZTU0MzM0ODA3ODdjNjQwMjgzZDIwNTVkZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBTEVYNDMxMDAiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmE4N2YyZjBjZTVkMzQ5OWM2MTExZDViY2NkYTY5ZGNhZjA3Mjc4YzdmMTk0OTlmZGU2OTFiYmU3NjZkODNjNSIKICAgIH0KICB9Cn0=";
 	private static final String SKIN_SIGNATURE = "mPqIDRZ7nTRXSGfD88mFbCrJU/ZNAcck6wKlPjqdN4uc9l2h/acXBJruhIrT7gcoYRZNDW54L16hGg0T3540ztTVcGuvF+bz8thulPvsQk+T78MjJNSi/GqNYogJ/ravZmYfcF+DaRxzm/7cD1XCosyWhrL4IMfM1Jk53nBLWEqipPiQrlrsZHFwoHYAC/9EvOJfQcSSKu9mniKWqHytY/cCWu4cy+NGY3MVTKfIeoDzlT/i7HYI+bl/lGA441vSuOCL1zhnUyEP2xAqEwcb7vVhL/8RR6GQOmA0Cq6p3M6tjTDRRSqML22GrAXkog9SmKD7vhdPOdXbue6hqFdTqH7JzZH0FGnoMCv3bCQuMZ95Oe6mkIlLQg0/55Lui/MmtzMsPOdDYw6hf6dij0lmWURKzdGKwU8mSeZvdD4bRSWvKZvzBlc6ZWAh3jUpCqLrGmeOPbWCwi9mYLYAPbLKIjAcSERomq2viG1siiePmlHpxNUn+bl0SVPLCjiIUxz89aGx6iZCLhyKc3x0ai/yTY3L57wlP9Hi53CmXWo4Qs9hjUk0fdnL1BCBTTdh3IC78sbNIevGejN1ZzNSEkJfyd0wF/46/Tk5jhlhKMb449bg0x5UlZpcnL5mPRMdtpNUlceS9RqhTv+73FpR/TehdiLUSLTo6GVB0SLB8tq/UjE=";
+
+	public static final GameProfile STONE_PROFILE = new GameProfile(UUID.randomUUID(), "test");
 
 	private Field windowIChatBaseField;
 	private Field windowItemsField;
@@ -37,6 +40,8 @@ public class PacketTransformer implements Listener {
 	private Field multiBlockField;
 
 	private Field multiBlockBlockField;
+
+	private Field playerInfoDataProfileField;
 
 	private void prepareReflections() {
 		try {
@@ -74,6 +79,9 @@ public class PacketTransformer implements Listener {
 
 			multiBlockBlockField = PacketPlayOutEntityEquipment.class.getDeclaredField("c");
 			multiBlockBlockField.setAccessible(true);
+
+			playerInfoDataProfileField = PacketPlayOutPlayerInfo.PlayerInfoData.class.getDeclaredField("d");
+			playerInfoDataProfileField.setAccessible(true);
 		} catch (ReflectiveOperationException ex) {
 			ex.printStackTrace();
 		}
@@ -85,6 +93,7 @@ public class PacketTransformer implements Listener {
 	@Invoke
 	public void init() {
 		prepareReflections();
+		PacketTransformer.transformProfile(STONE_PROFILE);
 		PacketUtil.listenPacket(PacketPlayOutWindowItems.class, this::transformWindowItems);
 		PacketUtil.listenPacket(PacketPlayOutSetSlot.class, this::transformSetSlot);
 		PacketUtil.listenPacket(PacketPlayOutEntityMetadata.class, this::transformEntityMetadata);
@@ -129,8 +138,14 @@ public class PacketTransformer implements Listener {
 	private void transformPlayerInfo(PacketEvent<PacketPlayOutPlayerInfo> packetPlayOutPlayerInfoPacketEvent) {
 		var packet = packetPlayOutPlayerInfoPacketEvent.getPacket();
 		for (var info : packet.getPlayersInfo()) {
-			var profile = info.a();
-			transformProfile(profile);
+			try {
+				var originalProfile = info.a();
+				var stonedProfile = new GameProfile(originalProfile.getId(), originalProfile.getName());
+				transformProfile(stonedProfile);
+				playerInfoDataProfileField.set(info, stonedProfile);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

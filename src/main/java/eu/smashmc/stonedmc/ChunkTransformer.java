@@ -1,8 +1,7 @@
 package eu.smashmc.stonedmc;
 
-import com.mojang.authlib.GameProfile;
-import eu.smashmc.api.core.Invoke;
 import eu.smashmc.api.core.Managed;
+import eu.smashmc.api.core.Schedule;
 import eu.smashmc.lib.bukkit.world.location.Locations;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -12,12 +11,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 
 import java.lang.reflect.Field;
-import java.util.UUID;
+
+import static eu.smashmc.stonedmc.PacketTransformer.STONE_PROFILE;
 
 @Managed
 public class ChunkTransformer implements Listener {
-
-	private static final GameProfile STONE_PROFILE = new GameProfile(UUID.randomUUID(), "test");
 
 
 	@EventHandler
@@ -26,10 +24,9 @@ public class ChunkTransformer implements Listener {
 		transferChunk(chunk);
 	}
 
-	@Invoke
+	@Schedule(delay = 1)
 	public void init() {
 		System.out.println("Running initial chunk transformer...");
-		PacketTransformer.transformProfile(STONE_PROFILE);
 		var world = Locations.spawn().getWorld();
 		for (var chunk : world.getLoadedChunks()) {
 			transferChunk(chunk);
