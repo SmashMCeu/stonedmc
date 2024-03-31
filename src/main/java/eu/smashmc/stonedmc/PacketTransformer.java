@@ -7,6 +7,7 @@ import eu.smashmc.api.core.Invoke;
 import eu.smashmc.api.core.Managed;
 import eu.smashmc.api.core.packet.PacketEvent;
 import eu.smashmc.api.core.packet.PacketUtil;
+import eu.smashmc.lib.hybrid.cloud.CloudWrapper;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -90,8 +91,10 @@ public class PacketTransformer implements Listener {
 		PacketUtil.listenPacket(PacketPlayOutEntityEquipment.class, this::transformEntityEquipment);
 		PacketUtil.listenPacket(PacketPlayOutPlayerInfo.class, this::transformPlayerInfo);
 		// This brakes alot of stuff
-		//	PacketUtil.listenPacket(PacketPlayOutBlockChange.class, this::transformBlockChange);
-		//	PacketUtil.listenPacket(PacketPlayOutMultiBlockChange.class, this::transformMultiBlockChange);
+		if (CloudWrapper.isLobbyServer()) {
+			PacketUtil.listenPacket(PacketPlayOutBlockChange.class, this::transformBlockChange);
+			PacketUtil.listenPacket(PacketPlayOutMultiBlockChange.class, this::transformMultiBlockChange);
+		}
 		PacketUtil.listenPacket(PacketPlayInBlockPlace.class, this::handleBlockPlace);
 	}
 
