@@ -3,13 +3,13 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.smashmc</groupId>
-	<artifactId>example-plugin</artifactId>
-	<name>Example</name>
-	<description>An example plugin for SmashMc.</description>
+	<artifactId>stonedmc</artifactId>
+	<name>StonedMC</name>
+	<description>We all gonna be stoned.</description>
 	<version>1.0.0</version>
 
 	<properties>
-		<bukkit.main>eu.smashmc.example.ExamplePlugin</bukkit.main>
+		<bukkit.main>eu.smashmc.stonedmc.StonePlugin</bukkit.main>
 		<maven.compiler.target>21</maven.compiler.target>
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
@@ -24,12 +24,10 @@
 			<url>https://repo.smashmc.eu/public</url>
 		</repository>
 		<!-- Uncomment to use private repo (Required for Smashlib)  -->
-		<!--
 		<repository>
 			<id>smashmc-private</id>
 			<url>https://repo.smashmc.eu/smashmc</url>
 		</repository>
-		-->
 	</repositories>
 
 	<dependencies>
@@ -41,17 +39,21 @@
 			<scope>provided</scope>
 		</dependency>
 		<!-- Uncomment to use Smashlib in project  -->
-		<!--
 		<dependency>
 			<groupId>eu.smashmc</groupId>
 			<artifactId>smash-lib</artifactId>
 			<version>${smash-lib.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>eu.smashmc.curryspigot</groupId>
 			<artifactId>api</artifactId>
+			<version>1.8.8-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.smashmc.curryspigot</groupId>
+			<artifactId>curryspigot</artifactId>
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>

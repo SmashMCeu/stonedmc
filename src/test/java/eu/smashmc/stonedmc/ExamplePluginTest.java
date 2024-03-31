@@ -1,8 +1,8 @@
-package eu.smashmc.example;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+package eu.smashmc.stonedmc;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExamplePluginTest {
 
