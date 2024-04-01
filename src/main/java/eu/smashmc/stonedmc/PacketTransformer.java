@@ -73,11 +73,10 @@ public class PacketTransformer implements Listener {
 			equipmentStack = PacketPlayOutEntityEquipment.class.getDeclaredField("c");
 			equipmentStack.setAccessible(true);
 
-
-			multiBlockField = PacketPlayOutEntityEquipment.class.getDeclaredField("b");
+			multiBlockField = PacketPlayOutMultiBlockChange.class.getDeclaredField("b");
 			multiBlockField.setAccessible(true);
 
-			multiBlockBlockField = PacketPlayOutEntityEquipment.class.getDeclaredField("c");
+			multiBlockBlockField = PacketPlayOutMultiBlockChange.MultiBlockChangeInfo.class.getDeclaredField("c");
 			multiBlockBlockField.setAccessible(true);
 
 			playerInfoDataProfileField = PacketPlayOutPlayerInfo.PlayerInfoData.class.getDeclaredField("d");
