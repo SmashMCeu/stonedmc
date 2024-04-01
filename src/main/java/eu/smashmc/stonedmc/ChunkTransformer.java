@@ -17,11 +17,10 @@ import static eu.smashmc.stonedmc.PacketTransformer.STONE_PROFILE;
 @Managed
 public class ChunkTransformer implements Listener {
 
-
 	@EventHandler
 	public void onLoad(ChunkLoadEvent event) {
 		var chunk = event.getChunk();
-		transferChunk(chunk);
+		transformChunk(chunk);
 	}
 
 	@Schedule(delay = 1)
@@ -29,13 +28,13 @@ public class ChunkTransformer implements Listener {
 		System.out.println("Running initial chunk transformer...");
 		var world = Locations.spawn().getWorld();
 		for (var chunk : world.getLoadedChunks()) {
-			transferChunk(chunk);
+			transformChunk(chunk);
 		}
 		System.out.println("Done.");
 	}
 
 
-	private void transferChunk(Chunk chunk) {
+	private void transformChunk(Chunk chunk) {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				var y = 255;

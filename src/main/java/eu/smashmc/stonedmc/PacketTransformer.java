@@ -25,16 +25,11 @@ public class PacketTransformer implements Listener {
 	private static final String SKIN_VALUE = "ewogICJ0aW1lc3RhbXAiIDogMTcxMTkxMDA3MDA2NCwKICAicHJvZmlsZUlkIiA6ICJiMDc3MDc2ZTU0MzM0ODA3ODdjNjQwMjgzZDIwNTVkZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBTEVYNDMxMDAiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmE4N2YyZjBjZTVkMzQ5OWM2MTExZDViY2NkYTY5ZGNhZjA3Mjc4YzdmMTk0OTlmZGU2OTFiYmU3NjZkODNjNSIKICAgIH0KICB9Cn0=";
 	private static final String SKIN_SIGNATURE = "mPqIDRZ7nTRXSGfD88mFbCrJU/ZNAcck6wKlPjqdN4uc9l2h/acXBJruhIrT7gcoYRZNDW54L16hGg0T3540ztTVcGuvF+bz8thulPvsQk+T78MjJNSi/GqNYogJ/ravZmYfcF+DaRxzm/7cD1XCosyWhrL4IMfM1Jk53nBLWEqipPiQrlrsZHFwoHYAC/9EvOJfQcSSKu9mniKWqHytY/cCWu4cy+NGY3MVTKfIeoDzlT/i7HYI+bl/lGA441vSuOCL1zhnUyEP2xAqEwcb7vVhL/8RR6GQOmA0Cq6p3M6tjTDRRSqML22GrAXkog9SmKD7vhdPOdXbue6hqFdTqH7JzZH0FGnoMCv3bCQuMZ95Oe6mkIlLQg0/55Lui/MmtzMsPOdDYw6hf6dij0lmWURKzdGKwU8mSeZvdD4bRSWvKZvzBlc6ZWAh3jUpCqLrGmeOPbWCwi9mYLYAPbLKIjAcSERomq2viG1siiePmlHpxNUn+bl0SVPLCjiIUxz89aGx6iZCLhyKc3x0ai/yTY3L57wlP9Hi53CmXWo4Qs9hjUk0fdnL1BCBTTdh3IC78sbNIevGejN1ZzNSEkJfyd0wF/46/Tk5jhlhKMb449bg0x5UlZpcnL5mPRMdtpNUlceS9RqhTv+73FpR/TehdiLUSLTo6GVB0SLB8tq/UjE=";
 
-	public static final GameProfile STONE_PROFILE = new GameProfile(UUID.randomUUID(), "test");
+	public static final GameProfile STONE_PROFILE = new GameProfile(UUID.randomUUID(), "stoned");
 
-	private Field windowIChatBaseField;
 	private Field windowItemsField;
 	private Field slotItemField;
 	private Field metadataField;
-	private Field datawatcherValueField;
-	private Field entityIdField;
-	private Field spawnDatawatcherField;
-	private Field metadataMapField;
 	private Field equipmentStack;
 
 	private Field multiBlockField;
@@ -43,54 +38,11 @@ public class PacketTransformer implements Listener {
 
 	private Field playerInfoDataProfileField;
 
-	private void prepareReflections() {
-		try {
-			windowIChatBaseField = PacketPlayOutOpenWindow.class.getDeclaredField("c");
-			windowIChatBaseField.setAccessible(true);
-
-			windowItemsField = PacketPlayOutWindowItems.class.getDeclaredField("b");
-			windowItemsField.setAccessible(true);
-
-			slotItemField = PacketPlayOutSetSlot.class.getDeclaredField("c");
-			slotItemField.setAccessible(true);
-
-			metadataField = PacketPlayOutEntityMetadata.class.getDeclaredField("b");
-			metadataField.setAccessible(true);
-
-			datawatcherValueField = DataWatcher.WatchableObject.class.getDeclaredField("c");
-			datawatcherValueField.setAccessible(true);
-
-			entityIdField = PacketPlayOutEntityMetadata.class.getDeclaredField("a");
-			entityIdField.setAccessible(true);
-
-			spawnDatawatcherField = PacketPlayOutSpawnEntityLiving.class.getDeclaredField("l");
-			spawnDatawatcherField.setAccessible(true);
-
-			metadataMapField = DataWatcher.class.getDeclaredField("d");
-			metadataMapField.setAccessible(true);
-
-
-			equipmentStack = PacketPlayOutEntityEquipment.class.getDeclaredField("c");
-			equipmentStack.setAccessible(true);
-
-			multiBlockField = PacketPlayOutMultiBlockChange.class.getDeclaredField("b");
-			multiBlockField.setAccessible(true);
-
-			multiBlockBlockField = PacketPlayOutMultiBlockChange.MultiBlockChangeInfo.class.getDeclaredField("c");
-			multiBlockBlockField.setAccessible(true);
-
-			playerInfoDataProfileField = PacketPlayOutPlayerInfo.PlayerInfoData.class.getDeclaredField("d");
-			playerInfoDataProfileField.setAccessible(true);
-		} catch (ReflectiveOperationException ex) {
-			ex.printStackTrace();
-		}
-	}
-
 	@Inject
 	private Plugin plugin;
 
 	@Invoke
-	public void init() {
+	public void init() throws NoSuchFieldException {
 		prepareReflections();
 		PacketTransformer.transformProfile(STONE_PROFILE);
 		PacketUtil.listenPacket(PacketPlayOutWindowItems.class, this::transformWindowItems);
@@ -98,7 +50,7 @@ public class PacketTransformer implements Listener {
 		PacketUtil.listenPacket(PacketPlayOutEntityMetadata.class, this::transformEntityMetadata);
 		PacketUtil.listenPacket(PacketPlayOutEntityEquipment.class, this::transformEntityEquipment);
 		PacketUtil.listenPacket(PacketPlayOutPlayerInfo.class, this::transformPlayerInfo);
-		// This brakes alot of stuff
+		// Disabled ingame as it breaks some mechanics
 		if (CloudWrapper.isLobbyServer()) {
 			PacketUtil.listenPacket(PacketPlayOutBlockChange.class, this::transformBlockChange);
 			PacketUtil.listenPacket(PacketPlayOutMultiBlockChange.class, this::transformMultiBlockChange);
@@ -106,6 +58,28 @@ public class PacketTransformer implements Listener {
 		PacketUtil.listenPacket(PacketPlayInBlockPlace.class, this::handleBlockPlace);
 	}
 
+	private void prepareReflections() throws NoSuchFieldException {
+		windowItemsField = PacketPlayOutWindowItems.class.getDeclaredField("b");
+		windowItemsField.setAccessible(true);
+
+		slotItemField = PacketPlayOutSetSlot.class.getDeclaredField("c");
+		slotItemField.setAccessible(true);
+
+		metadataField = PacketPlayOutEntityMetadata.class.getDeclaredField("b");
+		metadataField.setAccessible(true);
+
+		equipmentStack = PacketPlayOutEntityEquipment.class.getDeclaredField("c");
+		equipmentStack.setAccessible(true);
+
+		multiBlockField = PacketPlayOutMultiBlockChange.class.getDeclaredField("b");
+		multiBlockField.setAccessible(true);
+
+		multiBlockBlockField = PacketPlayOutMultiBlockChange.MultiBlockChangeInfo.class.getDeclaredField("c");
+		multiBlockBlockField.setAccessible(true);
+
+		playerInfoDataProfileField = PacketPlayOutPlayerInfo.PlayerInfoData.class.getDeclaredField("d");
+		playerInfoDataProfileField.setAccessible(true);
+	}
 
 	private void handleBlockPlace(PacketEvent<PacketPlayInBlockPlace> packetPlayInBlockPlacePacketEvent) {
 		Bukkit.getScheduler().runTask(plugin, () -> packetPlayInBlockPlacePacketEvent.getPlayer().updateInventory());
@@ -143,7 +117,7 @@ public class PacketTransformer implements Listener {
 				transformProfile(stonedProfile);
 				playerInfoDataProfileField.set(info, stonedProfile);
 			} catch (IllegalAccessException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 	}
